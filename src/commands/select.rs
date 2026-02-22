@@ -65,6 +65,8 @@ fn execute_selected(task: &ResolvedTask) -> Result<i32, RunzError> {
         return Ok(runner::execute(&task.def.cmd));
     }
 
+    eprintln!("  \x1b[32m{}\x1b[0m", task.def.cmd);
+
     match prompt_args(&task.def.args)? {
         PromptResult::Resolved(resolved) => {
             let cmd = expand_command(&task.def.cmd, &resolved);
@@ -80,9 +82,9 @@ fn prompt_args(defined: &IndexMap<String, String>) -> Result<PromptResult, RunzE
     for (name, default) in defined {
         let is_required = default.is_empty();
         let prompt_message = if is_required {
-            format!("{name} (required)")
+            format!("{name}:")
         } else {
-            format!("{name} (default: {default})")
+            format!("{name}[{default}]:")
         };
 
         let mut text_prompt = Text::new(&prompt_message);
@@ -94,12 +96,15 @@ fn prompt_args(defined: &IndexMap<String, String>) -> Result<PromptResult, RunzE
                     Ok(Validation::Valid)
                 }
             });
-        } else {
-            text_prompt = text_prompt.with_default(default);
         }
 
         match text_prompt.prompt() {
             Ok(value) => {
+                let value = if value.is_empty() && !is_required {
+                    default.clone()
+                } else {
+                    value
+                };
                 resolved.insert(name.clone(), value);
             }
             Err(InquireError::OperationCanceled | InquireError::OperationInterrupted) => {
