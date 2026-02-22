@@ -89,7 +89,7 @@ pub fn find_local_config(start: &Path) -> Option<PathBuf> {
 }
 
 pub fn global_config_path() -> Option<PathBuf> {
-    dirs::config_dir().map(|d| d.join("runz").join("config.toml"))
+    dirs::home_dir().map(|d| d.join(".config").join("runz").join("config.toml"))
 }
 
 // ---------- Loading & merging ----------
