@@ -1,12 +1,12 @@
 [package]
-name = "runz"
+name = "muu"
 version = "0.1.3"
 edition = "2024"
 publish = false
 license = "MIT"
 description = "A minimal, fast task runner"
-repository = "https://github.com/mfyuu/runz"
-homepage = "https://github.com/mfyuu/runz"
+repository = "https://github.com/mfyuu/muu"
+homepage = "https://github.com/mfyuu/muu"
 authors = ["mfyuu"]
 
 [dependencies]
@@ -15,7 +15,7 @@ toml = { version = "0.8", features = ["preserve_order"] }
 serde = { version = "1", features = ["derive"] }
 indexmap = { version = "2", features = ["serde"] }
 dirs = "6"
-inquire = { git = "https://github.com/mfyuu/inquire", branch = "runz" }
+inquire = { git = "https://github.com/mfyuu/inquire", branch = "muu" }
 thiserror = "2"
 
 [dev-dependencies]

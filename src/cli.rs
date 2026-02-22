@@ -2,7 +2,7 @@ use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
 #[command(
-    name = "runz",
+    name = "muu",
     version,
     about = "A minimal task runner"
 )]
@@ -23,7 +23,7 @@ pub struct Cli {
 pub enum Command {
     /// List all tasks
     List,
-    /// Initialize a new runz.toml
+    /// Initialize a new muu.toml
     Init,
     /// Run a task (catch-all for dynamic task names)
     #[command(external_subcommand)]

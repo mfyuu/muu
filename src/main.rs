@@ -10,7 +10,7 @@ use std::process;
 use clap::Parser;
 
 use cli::{Cli, Command};
-use error::RunzError;
+use error::MuuError;
 
 fn main() {
     let cli = Cli::parse();
@@ -24,7 +24,7 @@ fn main() {
     process::exit(code);
 }
 
-fn run(cli: Cli) -> Result<i32, RunzError> {
+fn run(cli: Cli) -> Result<i32, MuuError> {
     let cwd = std::env::current_dir()?;
 
     match cli.command {

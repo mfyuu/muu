@@ -1,11 +1,11 @@
-# runz
+# muu
 
 A minimal, fast task runner written in Rust.
 
 ## Features
 
 - TOML-based task definitions
-- Local (`runz.toml`) and global (`~/.config/runz/config.toml`) configuration
+- Local (`muu.toml`) and global (`~/.config/muu/config.toml`) configuration
 - Interactive task selector with fuzzy filtering
 - Positional and named arguments with defaults
 - Multi-line commands with fail-fast execution
@@ -16,27 +16,27 @@ A minimal, fast task runner written in Rust.
 ### Homebrew (macOS)
 
 ```sh
-brew install mfyuu/tap/runz
+brew install mfyuu/tap/muu
 ```
 
 ### Shell (macOS / Linux)
 
 ```sh
-curl --proto '=https' --tlsv1.2 -LsSf https://github.com/mfyuu/runz/releases/latest/download/runz-installer.sh | sh
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/mfyuu/muu/releases/latest/download/muu-installer.sh | sh
 ```
 
 ### PowerShell (Windows)
 
 ```sh
-powershell -ExecutionPolicy Bypass -c "irm https://github.com/mfyuu/runz/releases/latest/download/runz-installer.ps1 | iex"
+powershell -ExecutionPolicy Bypass -c "irm https://github.com/mfyuu/muu/releases/latest/download/muu-installer.ps1 | iex"
 ```
 
 ## Quick Start
 
-Create a `runz.toml` in your project:
+Create a `muu.toml` in your project:
 
 ```sh
-runz init
+muu init
 ```
 
 This generates a starter file. Edit it to define your tasks:
@@ -62,15 +62,15 @@ npm install
 ### Run a task
 
 ```sh
-runz deploy ./dist my-bucket      # positional args
-runz deploy --bucket=my-bucket    # named args (dir uses default ".")
-runz hello                        # no args
+muu deploy ./dist my-bucket      # positional args
+muu deploy --bucket=my-bucket    # named args (dir uses default ".")
+muu hello                        # no args
 ```
 
 ### Interactive selector
 
 ```sh
-runz
+muu
 ```
 
 Launches a fuzzy-searchable task selector. If the selected task has arguments, you'll be prompted for each one.
@@ -78,7 +78,7 @@ Launches a fuzzy-searchable task selector. If the selected task has arguments, y
 ### List tasks
 
 ```sh
-runz list
+muu list
 ```
 
 ```
@@ -90,9 +90,9 @@ setup                   [local]
 ### Filter by scope
 
 ```sh
-runz -l         # local tasks only
-runz -g         # global tasks only
-runz list -l    # works with list too
+muu -l         # local tasks only
+muu -g         # global tasks only
+muu list -l    # works with list too
 ```
 
 ## Task Definition
@@ -100,7 +100,7 @@ runz list -l    # works with list too
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `cmd` | string | yes | Command to run. Use `"""` for multi-line. |
-| `description` | string | no | Shown in `runz list` and the selector. |
+| `description` | string | no | Shown in `muu list` and the selector. |
 | `args` | inline table | no | Argument definitions. Key order = positional order. |
 
 ### Arguments
@@ -115,8 +115,8 @@ args = { dir = ".", bucket = "" }
 
 ## Configuration
 
-- **Local**: searches upward from the current directory for `runz.toml`
-- **Global**: `~/.config/runz/config.toml`
+- **Local**: searches upward from the current directory for `muu.toml`
+- **Global**: `~/.config/muu/config.toml`
 - Local tasks override global tasks with the same name
 
 ## License

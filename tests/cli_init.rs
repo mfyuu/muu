@@ -3,32 +3,32 @@ use predicates::prelude::*;
 use tempfile::TempDir;
 
 #[allow(deprecated)]
-fn runz() -> Command {
-    Command::cargo_bin("runz").unwrap()
+fn muu() -> Command {
+    Command::cargo_bin("muu").unwrap()
 }
 
 #[test]
 fn init_creates_file() {
     let dir = TempDir::new().unwrap();
-    runz()
+    muu()
         .arg("init")
         .current_dir(dir.path())
         .assert()
         .success()
-        .stdout(predicate::str::contains("Created runz.toml"));
+        .stdout(predicate::str::contains("Created muu.toml"));
 
-    assert!(dir.path().join("runz.toml").exists());
+    assert!(dir.path().join("muu.toml").exists());
 }
 
 #[test]
 fn init_already_exists() {
     let dir = TempDir::new().unwrap();
-    std::fs::write(dir.path().join("runz.toml"), "[tasks]").unwrap();
+    std::fs::write(dir.path().join("muu.toml"), "[tasks]").unwrap();
 
-    runz()
+    muu()
         .arg("init")
         .current_dir(dir.path())
         .assert()
         .failure()
-        .stderr(predicate::str::contains("runz.toml already exists"));
+        .stderr(predicate::str::contains("muu.toml already exists"));
 }

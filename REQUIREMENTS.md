@@ -1,8 +1,8 @@
-# runz - ミニマルタスクランナー 要件定義書
+# muu - ミニマルタスクランナー 要件定義書
 
 ## 概要
 
-runz は Rust 製のミニマルで高速なタスクランナー。TOML ファイルでタスクを定義し、プロジェクトローカルとグローバルの設定を共存でき、インタラクティブなセレクターによるタスク実行をサポートする。
+muu は Rust 製のミニマルで高速なタスクランナー。TOML ファイルでタスクを定義し、プロジェクトローカルとグローバルの設定を共存でき、インタラクティブなセレクターによるタスク実行をサポートする。
 
 ## 設計方針
 
@@ -15,7 +15,7 @@ runz は Rust 製のミニマルで高速なタスクランナー。TOML ファ�
 
 ## タスク定義フォーマット
 
-### ファイル: `runz.toml`（ローカル） / `~/.config/runz/config.toml`（グローバル）
+### ファイル: `muu.toml`（ローカル） / `~/.config/muu/config.toml`（グローバル）
 
 ```toml
 [tasks.deploy]
@@ -40,7 +40,7 @@ npm install
 | プロパティ | 型 | 必須 | 説明 |
 |-----------|------|------|------|
 | `cmd` | string | yes | 実行するコマンド。`"""`で複数行対応。 |
-| `description` | string | no | `runz list` やセレクターで表示される説明文。 |
+| `description` | string | no | `muu list` やセレクターで表示される説明文。 |
 | `args` | インラインテーブル | no | 引数定義。キーの順序 = 位置引数の順序。 |
 
 ### 引数定義
@@ -66,21 +66,21 @@ args = { dir = ".", bucket = "" }
 ### 位置引数（定義順に対応）
 
 ```bash
-$ runz deploy ./dist my-bucket
+$ muu deploy ./dist my-bucket
 # → dir="./dist", bucket="my-bucket"
 ```
 
 末尾の引数を省略するとデフォルト値が使われる（必須ならエラー）:
 
 ```bash
-$ runz deploy ./dist
+$ muu deploy ./dist
 # → dir="./dist", bucket="" → エラー（bucket は必須）
 ```
 
 ### 名前付き引数（キーを明示）
 
 ```bash
-$ runz deploy --bucket=my-bucket
+$ muu deploy --bucket=my-bucket
 # → dir="."（デフォルト）, bucket="my-bucket"
 ```
 
@@ -95,20 +95,20 @@ $ runz deploy --bucket=my-bucket
 
 ## コマンド
 
-### `runz <task> [args...]`
+### `muu <task> [args...]`
 
 タスクを直接実行する。
 
 ```bash
-$ runz deploy ./dist my-bucket
-$ runz deploy --bucket=my-bucket
-$ runz lint
+$ muu deploy ./dist my-bucket
+$ muu deploy --bucket=my-bucket
+$ muu lint
 ```
 
 - 必須引数が未指定 → エラー
 - タスクが見つからない → エラー
 
-### `runz`（タスク未指定）
+### `muu`（タスク未指定）
 
 インタラクティブセレクターを起動し、選択したタスクを直接実行する。
 
@@ -122,7 +122,7 @@ $ runz lint
     - ESC でプロンプトをキャンセル → 何も実行せず終了コード 1 で終了
 - ESC でセレクターをキャンセル → 何も実行せず終了コード 1 で終了
 
-### `runz -g` / `runz -l`
+### `muu -g` / `muu -l`
 
 ソースでタスクをフィルタ:
 
@@ -132,7 +132,7 @@ $ runz lint
 | `-l` | ローカルタスクのみ表示 |
 | なし | 全て表示（マージ済み） |
 
-### `runz list`
+### `muu list`
 
 全タスクをフォーマットされた一覧で表示する。
 
@@ -144,18 +144,18 @@ git-prune - gitブランチ整理           [global]
 ```
 
 - タスク名、説明文、ソース（`[local]` / `[global]`）を表示
-- `runz` と同様に `-g` / `-l` フラグに対応
+- `muu` と同様に `-g` / `-l` フラグに対応
 
-### `runz init`
+### `muu init`
 
-カレントディレクトリに `runz.toml` のひな形を生成する。
+カレントディレクトリに `muu.toml` のひな形を生成する。
 
-- `runz.toml` が既に存在する場合 → エラー（上書きしない）
+- `muu.toml` が既に存在する場合 → エラー（上書きしない）
 - サンプルタスク（例: `echo "hello"`）を含むファイルを生成
 
-### `runz --version`
+### `muu --version`
 
-runz のバージョンを表示する。
+muu のバージョンを表示する。
 
 ---
 
@@ -163,8 +163,8 @@ runz のバージョンを表示する。
 
 ### ファイル探索
 
-- **ローカル**: カレントディレクトリから上方向に `runz.toml` を探索。最初に見つかったものを使用。
-- **グローバル**: `~/.config/runz/config.toml`（固定パス）
+- **ローカル**: カレントディレクトリから上方向に `muu.toml` を探索。最初に見つかったものを使用。
+- **グローバル**: `~/.config/muu/config.toml`（固定パス）
 
 ### マージルール
 
@@ -202,9 +202,9 @@ npm install
 |------|------|
 | 必須引数の未指定 | エラー: `error: missing required argument '<名前>'` |
 | タスクが見つからない | エラー: `error: task '<名前>' not found` |
-| 設定ファイルが見つからない | エラー: `error: no runz.toml or global config found` |
+| 設定ファイルが見つからない | エラー: `error: no muu.toml or global config found` |
 | 同一スコープ内でタスク名重複 | エラー: `error: duplicate task '<名前>' in <パス>` |
-| `runz init` で既存ファイルあり | エラー: `error: runz.toml already exists` |
+| `muu init` で既存ファイルあり | エラー: `error: muu.toml already exists` |
 | タスクが0件 | エラー: `error: no tasks defined` |
 | コマンド実行失敗 | 失敗したコマンドの終了コードで終了 |
 
@@ -237,7 +237,7 @@ npm install
 
 `tests/` ディレクトリに配置し、実際の CLI バイナリを実行して検証する:
 
-- 各コマンド（`runz <task>`、`runz list`、`runz init`、`runz --version`）の正常動作
+- 各コマンド（`muu <task>`、`muu list`、`muu init`、`muu --version`）の正常動作
 - エラーケース（タスク未発見、必須引数不足、設定ファイル不在など）の終了コードとエラーメッセージ
 - ローカル / グローバル設定ファイルの探索とマージ
 - 複数行コマンドの実行と途中失敗時の停止

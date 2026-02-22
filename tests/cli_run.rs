@@ -3,15 +3,15 @@ use predicates::prelude::*;
 use tempfile::TempDir;
 
 #[allow(deprecated)]
-fn runz() -> Command {
-    Command::cargo_bin("runz").unwrap()
+fn muu() -> Command {
+    Command::cargo_bin("muu").unwrap()
 }
 
 #[test]
 fn run_simple_task() {
     let dir = TempDir::new().unwrap();
     std::fs::write(
-        dir.path().join("runz.toml"),
+        dir.path().join("muu.toml"),
         r#"
 [tasks.hello]
 cmd = "echo hello"
@@ -19,7 +19,7 @@ cmd = "echo hello"
     )
     .unwrap();
 
-    runz()
+    muu()
         .arg("hello")
         .current_dir(dir.path())
         .assert()
@@ -31,7 +31,7 @@ cmd = "echo hello"
 fn run_with_positional_args() {
     let dir = TempDir::new().unwrap();
     std::fs::write(
-        dir.path().join("runz.toml"),
+        dir.path().join("muu.toml"),
         r#"
 [tasks.greet]
 cmd = "echo $name $greeting"
@@ -40,7 +40,7 @@ args = { name = "", greeting = "hello" }
     )
     .unwrap();
 
-    runz()
+    muu()
         .args(["greet", "Alice"])
         .current_dir(dir.path())
         .assert()
@@ -52,7 +52,7 @@ args = { name = "", greeting = "hello" }
 fn run_with_named_args() {
     let dir = TempDir::new().unwrap();
     std::fs::write(
-        dir.path().join("runz.toml"),
+        dir.path().join("muu.toml"),
         r#"
 [tasks.greet]
 cmd = "echo $name $greeting"
@@ -61,7 +61,7 @@ args = { name = "", greeting = "hello" }
     )
     .unwrap();
 
-    runz()
+    muu()
         .args(["greet", "--name=Bob", "--greeting=hi"])
         .current_dir(dir.path())
         .assert()
@@ -73,7 +73,7 @@ args = { name = "", greeting = "hello" }
 fn run_missing_required_arg() {
     let dir = TempDir::new().unwrap();
     std::fs::write(
-        dir.path().join("runz.toml"),
+        dir.path().join("muu.toml"),
         r#"
 [tasks.greet]
 cmd = "echo $name"
@@ -82,7 +82,7 @@ args = { name = "" }
     )
     .unwrap();
 
-    runz()
+    muu()
         .arg("greet")
         .current_dir(dir.path())
         .assert()
@@ -94,7 +94,7 @@ args = { name = "" }
 fn run_unknown_named_arg() {
     let dir = TempDir::new().unwrap();
     std::fs::write(
-        dir.path().join("runz.toml"),
+        dir.path().join("muu.toml"),
         r#"
 [tasks.greet]
 cmd = "echo $name"
@@ -103,7 +103,7 @@ args = { name = "" }
     )
     .unwrap();
 
-    runz()
+    muu()
         .args(["greet", "--typo=value"])
         .current_dir(dir.path())
         .assert()
@@ -114,9 +114,9 @@ args = { name = "" }
 #[test]
 fn run_task_not_found() {
     let dir = TempDir::new().unwrap();
-    std::fs::write(dir.path().join("runz.toml"), "[tasks]\n").unwrap();
+    std::fs::write(dir.path().join("muu.toml"), "[tasks]\n").unwrap();
 
-    runz()
+    muu()
         .arg("nonexistent")
         .current_dir(dir.path())
         .assert()
@@ -128,12 +128,12 @@ fn run_task_not_found() {
 fn run_multiline_command() {
     let dir = TempDir::new().unwrap();
     std::fs::write(
-        dir.path().join("runz.toml"),
+        dir.path().join("muu.toml"),
         "[tasks.multi]\ncmd = \"\"\"\necho line1\necho line2\n\"\"\"\n",
     )
     .unwrap();
 
-    runz()
+    muu()
         .arg("multi")
         .current_dir(dir.path())
         .assert()
@@ -146,12 +146,12 @@ fn run_multiline_command() {
 fn run_multiline_stops_on_error() {
     let dir = TempDir::new().unwrap();
     std::fs::write(
-        dir.path().join("runz.toml"),
+        dir.path().join("muu.toml"),
         "[tasks.fail]\ncmd = \"\"\"\necho before\nfalse\necho after\n\"\"\"\n",
     )
     .unwrap();
 
-    runz()
+    muu()
         .arg("fail")
         .current_dir(dir.path())
         .assert()
@@ -162,9 +162,9 @@ fn run_multiline_stops_on_error() {
 
 #[test]
 fn version_flag() {
-    runz()
+    muu()
         .arg("--version")
         .assert()
         .success()
-        .stdout(predicate::str::contains("runz"));
+        .stdout(predicate::str::contains("muu"));
 }

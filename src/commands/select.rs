@@ -5,7 +5,7 @@ use inquire::validator::Validation;
 use inquire::{InquireError, Select, Text};
 
 use crate::config::ResolvedTask;
-use crate::error::RunzError;
+use crate::error::MuuError;
 use crate::runner;
 use crate::task::expand_command;
 
@@ -33,9 +33,9 @@ impl fmt::Display for TaskOption<'_> {
     }
 }
 
-pub fn select(tasks: &[ResolvedTask]) -> Result<i32, RunzError> {
+pub fn select(tasks: &[ResolvedTask]) -> Result<i32, MuuError> {
     if tasks.is_empty() {
-        return Err(RunzError::NoTasksDefined);
+        return Err(MuuError::NoTasksDefined);
     }
 
     let max_name = tasks.iter().map(|t| t.name.len()).max().unwrap_or(0);
@@ -64,7 +64,7 @@ enum PromptResult {
     Cancelled,
 }
 
-fn execute_selected(task: &ResolvedTask) -> Result<i32, RunzError> {
+fn execute_selected(task: &ResolvedTask) -> Result<i32, MuuError> {
     if task.def.args.is_empty() {
         return Ok(runner::execute(&task.def.cmd));
     }
@@ -80,7 +80,7 @@ fn execute_selected(task: &ResolvedTask) -> Result<i32, RunzError> {
     }
 }
 
-fn prompt_args(defined: &IndexMap<String, String>) -> Result<PromptResult, RunzError> {
+fn prompt_args(defined: &IndexMap<String, String>) -> Result<PromptResult, MuuError> {
     let mut resolved: IndexMap<String, String> = IndexMap::new();
 
     for (name, default) in defined {

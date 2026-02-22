@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use indexmap::IndexMap;
 use serde::Deserialize;
 
-use crate::error::RunzError;
+use crate::error::MuuError;
 
 // ---------- TOML deserialization types ----------
 
@@ -48,17 +48,17 @@ pub struct ResolvedTask {
 
 // ---------- Parsing ----------
 
-pub fn parse_config(path: &Path) -> Result<ConfigFile, RunzError> {
-    let content = std::fs::read_to_string(path).map_err(RunzError::Io)?;
+pub fn parse_config(path: &Path) -> Result<ConfigFile, MuuError> {
+    let content = std::fs::read_to_string(path).map_err(MuuError::Io)?;
     toml::from_str::<ConfigFile>(&content).map_err(|e| {
         let msg = e.to_string();
         if let Some(name) = extract_duplicate_key(&msg) {
-            RunzError::DuplicateTask {
+            MuuError::DuplicateTask {
                 name,
                 path: path.to_path_buf(),
             }
         } else {
-            RunzError::ConfigParse {
+            MuuError::ConfigParse {
                 path: path.to_path_buf(),
                 reason: msg,
             }
@@ -78,7 +78,7 @@ fn extract_duplicate_key(msg: &str) -> Option<String> {
 pub fn find_local_config(start: &Path) -> Option<PathBuf> {
     let mut dir = start.to_path_buf();
     loop {
-        let candidate = dir.join("runz.toml");
+        let candidate = dir.join("muu.toml");
         if candidate.is_file() {
             return Some(candidate);
         }
@@ -89,7 +89,7 @@ pub fn find_local_config(start: &Path) -> Option<PathBuf> {
 }
 
 pub fn global_config_path() -> Option<PathBuf> {
-    dirs::home_dir().map(|d| d.join(".config").join("runz").join("config.toml"))
+    dirs::home_dir().map(|d| d.join(".config").join("muu").join("config.toml"))
 }
 
 // ---------- Loading & merging ----------
@@ -98,7 +98,7 @@ pub fn load_tasks(
     start_dir: &Path,
     local_only: bool,
     global_only: bool,
-) -> Result<Vec<ResolvedTask>, RunzError> {
+) -> Result<Vec<ResolvedTask>, MuuError> {
     let local_path = if !global_only {
         find_local_config(start_dir)
     } else {
@@ -111,7 +111,7 @@ pub fn load_tasks(
     };
 
     if local_path.is_none() && global_path.is_none() {
-        return Err(RunzError::NoConfigFound);
+        return Err(MuuError::NoConfigFound);
     }
 
     let mut tasks: IndexMap<String, ResolvedTask> = IndexMap::new();
@@ -121,7 +121,7 @@ pub fn load_tasks(
         let cfg = parse_config(gp)?;
         for (name, def) in cfg.tasks {
             if tasks.contains_key(&name) {
-                return Err(RunzError::DuplicateTask {
+                return Err(MuuError::DuplicateTask {
                     name,
                     path: gp.clone(),
                 });
@@ -143,7 +143,7 @@ pub fn load_tasks(
         let mut seen_local: IndexMap<String, ()> = IndexMap::new();
         for (name, def) in cfg.tasks {
             if seen_local.contains_key(&name) {
-                return Err(RunzError::DuplicateTask {
+                return Err(MuuError::DuplicateTask {
                     name,
                     path: lp.clone(),
                 });
@@ -181,7 +181,7 @@ mod tests {
         let dir = TempDir::new().unwrap();
         let path = write_file(
             dir.path(),
-            "runz.toml",
+            "muu.toml",
             r#"
 [tasks.hello]
 cmd = "echo hello"
@@ -213,19 +213,19 @@ args = { dir = ".", bucket = "" }
     #[test]
     fn parse_invalid_toml() {
         let dir = TempDir::new().unwrap();
-        let path = write_file(dir.path(), "runz.toml", "not valid toml {{{}");
+        let path = write_file(dir.path(), "muu.toml", "not valid toml {{{}");
         let err = parse_config(&path).unwrap_err();
-        assert!(matches!(err, RunzError::ConfigParse { .. }));
+        assert!(matches!(err, MuuError::ConfigParse { .. }));
     }
 
     #[test]
     fn find_local_config_upward() {
         let root = TempDir::new().unwrap();
-        write_file(root.path(), "runz.toml", "[tasks]");
+        write_file(root.path(), "muu.toml", "[tasks]");
         let child = root.path().join("a").join("b").join("c");
         std::fs::create_dir_all(&child).unwrap();
         let found = find_local_config(&child).unwrap();
-        assert_eq!(found, root.path().join("runz.toml"));
+        assert_eq!(found, root.path().join("muu.toml"));
     }
 
     #[test]
@@ -239,7 +239,7 @@ args = { dir = ".", bucket = "" }
         let local_dir = TempDir::new().unwrap();
         write_file(
             local_dir.path(),
-            "runz.toml",
+            "muu.toml",
             r#"
 [tasks.hello]
 cmd = "echo local"
@@ -248,7 +248,7 @@ cmd = "echo local"
 
         // Simulate global config
         let global_dir = TempDir::new().unwrap();
-        let global_cfg_dir = global_dir.path().join("runz");
+        let global_cfg_dir = global_dir.path().join("muu");
         std::fs::create_dir_all(&global_cfg_dir).unwrap();
         write_file(
             &global_cfg_dir,
@@ -265,7 +265,7 @@ cmd = "echo g"
         // We can't easily override global_config_path in a unit test,
         // so we test the merge logic directly.
         let global_cfg = parse_config(&global_cfg_dir.join("config.toml")).unwrap();
-        let local_cfg = parse_config(&local_dir.path().join("runz.toml")).unwrap();
+        let local_cfg = parse_config(&local_dir.path().join("muu.toml")).unwrap();
 
         let mut tasks: IndexMap<String, ResolvedTask> = IndexMap::new();
         for (name, def) in global_cfg.tasks {
@@ -300,7 +300,7 @@ cmd = "echo g"
     fn no_config_found() {
         let dir = TempDir::new().unwrap();
         let err = load_tasks(dir.path(), true, false).unwrap_err();
-        assert!(matches!(err, RunzError::NoConfigFound));
+        assert!(matches!(err, MuuError::NoConfigFound));
     }
 
     #[test]
@@ -308,7 +308,7 @@ cmd = "echo g"
         let dir = TempDir::new().unwrap();
         let path = write_file(
             dir.path(),
-            "runz.toml",
+            "muu.toml",
             r#"
 [tasks.deploy]
 cmd = "deploy $env $region $count"

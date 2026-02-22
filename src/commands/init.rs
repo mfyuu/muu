@@ -1,18 +1,18 @@
 use std::path::Path;
 
-use crate::error::RunzError;
+use crate::error::MuuError;
 
 const TEMPLATE: &str = r#"[tasks.hello]
 cmd = "echo hello"
 description = "Say hello"
 "#;
 
-pub fn init(dir: &Path) -> Result<(), RunzError> {
-    let path = dir.join("runz.toml");
+pub fn init(dir: &Path) -> Result<(), MuuError> {
+    let path = dir.join("muu.toml");
     if path.exists() {
-        return Err(RunzError::AlreadyExists);
+        return Err(MuuError::AlreadyExists);
     }
     std::fs::write(&path, TEMPLATE)?;
-    println!("Created runz.toml");
+    println!("Created muu.toml");
     Ok(())
 }

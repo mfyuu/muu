@@ -3,20 +3,20 @@ use std::path::PathBuf;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub enum RunzError {
+pub enum MuuError {
     #[error("missing required argument '{name}'")]
     MissingRequiredArg { name: String },
 
     #[error("task '{name}' not found")]
     TaskNotFound { name: String },
 
-    #[error("no runz.toml or global config found")]
+    #[error("no muu.toml or global config found")]
     NoConfigFound,
 
     #[error("duplicate task '{name}' in {path}")]
     DuplicateTask { name: String, path: PathBuf },
 
-    #[error("runz.toml already exists")]
+    #[error("muu.toml already exists")]
     AlreadyExists,
 
     #[error("unknown argument '{name}'")]

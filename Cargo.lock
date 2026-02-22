@@ -375,7 +375,7 @@ dependencies = [
 [[package]]
 name = "inquire"
 version = "0.9.3"
-source = "git+https://github.com/mfyuu/inquire?branch=runz#f8cf5d6f55804cd6f77ba16c9947ca583ccfd7dc"
+source = "git+https://github.com/mfyuu/inquire?branch=muu#f8cf5d6f55804cd6f77ba16c9947ca583ccfd7dc"
 dependencies = [
  "bitflags",
  "crossterm",
@@ -462,6 +462,23 @@ dependencies = [
  "log",
  "wasi",
  "windows-sys",
+]
+
+[[package]]
+name = "muu"
+version = "0.1.3"
+dependencies = [
+ "assert_cmd",
+ "clap",
+ "dirs",
+ "indexmap",
+ "inquire",
+ "predicates",
+ "pretty_assertions",
+ "serde",
+ "tempfile",
+ "thiserror",
+ "toml",
 ]
 
 [[package]]
@@ -642,23 +659,6 @@ name = "regex-syntax"
 version = "0.8.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a96887878f22d7bad8a3b6dc5b7440e0ada9a245242924394987b21cf2210a4c"
-
-[[package]]
-name = "runz"
-version = "0.1.3"
-dependencies = [
- "assert_cmd",
- "clap",
- "dirs",
- "indexmap",
- "inquire",
- "predicates",
- "pretty_assertions",
- "serde",
- "tempfile",
- "thiserror",
- "toml",
-]
 
 [[package]]
 name = "rustc_version"

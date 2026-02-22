@@ -1,6 +1,6 @@
 use indexmap::IndexMap;
 
-use crate::error::RunzError;
+use crate::error::MuuError;
 
 /// Classify raw CLI args as positional or named.
 enum ArgStyle {
@@ -9,7 +9,7 @@ enum ArgStyle {
     None,
 }
 
-fn classify_args(raw: &[String]) -> Result<ArgStyle, RunzError> {
+fn classify_args(raw: &[String]) -> Result<ArgStyle, MuuError> {
     if raw.is_empty() {
         return Ok(ArgStyle::None);
     }
@@ -18,7 +18,7 @@ fn classify_args(raw: &[String]) -> Result<ArgStyle, RunzError> {
     let has_positional = raw.iter().any(|a| !a.starts_with("--"));
 
     if has_named && has_positional {
-        return Err(RunzError::MixedArgStyles);
+        return Err(MuuError::MixedArgStyles);
     }
 
     if has_named {
@@ -42,7 +42,7 @@ fn classify_args(raw: &[String]) -> Result<ArgStyle, RunzError> {
 pub fn resolve_args(
     defined: &IndexMap<String, String>,
     raw: &[String],
-) -> Result<IndexMap<String, String>, RunzError> {
+) -> Result<IndexMap<String, String>, MuuError> {
     let style = classify_args(raw)?;
     let mut resolved: IndexMap<String, String> = IndexMap::new();
 
@@ -50,7 +50,7 @@ pub fn resolve_args(
         ArgStyle::None => {
             for (name, default) in defined {
                 if default.is_empty() {
-                    return Err(RunzError::MissingRequiredArg {
+                    return Err(MuuError::MissingRequiredArg {
                         name: name.clone(),
                     });
                 }
@@ -62,7 +62,7 @@ pub fn resolve_args(
                 if let Some(val) = values.get(i) {
                     resolved.insert(name.clone(), val.clone());
                 } else if default.is_empty() {
-                    return Err(RunzError::MissingRequiredArg {
+                    return Err(MuuError::MissingRequiredArg {
                         name: name.clone(),
                     });
                 } else {
@@ -80,13 +80,13 @@ pub fn resolve_args(
                 if resolved.contains_key(key) {
                     resolved.insert(key.clone(), value.clone());
                 } else {
-                    return Err(RunzError::UnknownArg { name: key.clone() });
+                    return Err(MuuError::UnknownArg { name: key.clone() });
                 }
             }
             // Check required args
             for (name, value) in &resolved {
                 if value.is_empty() {
-                    return Err(RunzError::MissingRequiredArg {
+                    return Err(MuuError::MissingRequiredArg {
                         name: name.clone(),
                     });
                 }
@@ -149,7 +149,7 @@ mod tests {
     fn positional_missing_required() {
         let defined = idx(&[("dir", "."), ("bucket", "")]);
         let err = resolve_args(&defined, &strs(&["./dist"])).unwrap_err();
-        assert!(matches!(err, RunzError::MissingRequiredArg { name } if name == "bucket"));
+        assert!(matches!(err, MuuError::MissingRequiredArg { name } if name == "bucket"));
     }
 
     #[test]
@@ -165,14 +165,14 @@ mod tests {
     fn named_missing_required() {
         let defined = idx(&[("dir", "."), ("bucket", "")]);
         let err = resolve_args(&defined, &strs(&["--dir=./dist"])).unwrap_err();
-        assert!(matches!(err, RunzError::MissingRequiredArg { name } if name == "bucket"));
+        assert!(matches!(err, MuuError::MissingRequiredArg { name } if name == "bucket"));
     }
 
     #[test]
     fn named_unknown_arg_error() {
         let defined = idx(&[("dir", "."), ("bucket", "")]);
         let err = resolve_args(&defined, &strs(&["--typo=value"])).unwrap_err();
-        assert!(matches!(err, RunzError::UnknownArg { name } if name == "typo"));
+        assert!(matches!(err, MuuError::UnknownArg { name } if name == "typo"));
     }
 
     #[test]
@@ -180,7 +180,7 @@ mod tests {
         let defined = idx(&[("dir", "."), ("bucket", "")]);
         let err =
             resolve_args(&defined, &strs(&["./dist", "--bucket=my-bucket"])).unwrap_err();
-        assert!(matches!(err, RunzError::MixedArgStyles));
+        assert!(matches!(err, MuuError::MixedArgStyles));
     }
 
     #[test]
@@ -195,7 +195,7 @@ mod tests {
     fn no_args_missing_required() {
         let defined = idx(&[("bucket", "")]);
         let err = resolve_args(&defined, &[]).unwrap_err();
-        assert!(matches!(err, RunzError::MissingRequiredArg { name } if name == "bucket"));
+        assert!(matches!(err, MuuError::MissingRequiredArg { name } if name == "bucket"));
     }
 
     #[test]

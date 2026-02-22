@@ -3,27 +3,27 @@ use predicates::prelude::*;
 use tempfile::TempDir;
 
 #[allow(deprecated)]
-fn runz() -> Command {
-    Command::cargo_bin("runz").unwrap()
+fn muu() -> Command {
+    Command::cargo_bin("muu").unwrap()
 }
 
 #[test]
 fn config_not_found() {
     let dir = TempDir::new().unwrap();
-    runz()
+    muu()
         .arg("-l")
         .arg("list")
         .current_dir(dir.path())
         .assert()
         .failure()
-        .stderr(predicate::str::contains("no runz.toml or global config found"));
+        .stderr(predicate::str::contains("no muu.toml or global config found"));
 }
 
 #[test]
 fn config_upward_search() {
     let root = TempDir::new().unwrap();
     std::fs::write(
-        root.path().join("runz.toml"),
+        root.path().join("muu.toml"),
         r#"
 [tasks.hello]
 cmd = "echo found"
@@ -35,7 +35,7 @@ description = "Found via upward search"
     let child = root.path().join("a").join("b");
     std::fs::create_dir_all(&child).unwrap();
 
-    runz()
+    muu()
         .arg("hello")
         .current_dir(&child)
         .assert()
@@ -46,9 +46,9 @@ description = "Found via upward search"
 #[test]
 fn config_parse_error() {
     let dir = TempDir::new().unwrap();
-    std::fs::write(dir.path().join("runz.toml"), "invalid toml {{{").unwrap();
+    std::fs::write(dir.path().join("muu.toml"), "invalid toml {{{").unwrap();
 
-    runz()
+    muu()
         .arg("list")
         .current_dir(dir.path())
         .assert()
@@ -60,7 +60,7 @@ fn config_parse_error() {
 fn mixed_args_error() {
     let dir = TempDir::new().unwrap();
     std::fs::write(
-        dir.path().join("runz.toml"),
+        dir.path().join("muu.toml"),
         r#"
 [tasks.deploy]
 cmd = "echo $dir $bucket"
@@ -69,7 +69,7 @@ args = { dir = ".", bucket = "" }
     )
     .unwrap();
 
-    runz()
+    muu()
         .args(["deploy", "./dist", "--bucket=my-bucket"])
         .current_dir(dir.path())
         .assert()
