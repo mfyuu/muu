@@ -31,9 +31,6 @@ pub enum RunzError {
     #[error("error: no tasks defined")]
     NoTasksDefined,
 
-    #[error("error: unsupported shell '{name}'")]
-    UnsupportedShell { name: String },
-
     #[error("{0}")]
     Io(#[from] std::io::Error),
 }

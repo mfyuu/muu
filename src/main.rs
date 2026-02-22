@@ -37,10 +37,6 @@ fn run(cli: Cli) -> Result<i32, RunzError> {
             commands::list::list(&tasks);
             Ok(0)
         }
-        Some(Command::ShellInit { ref shell }) => {
-            commands::shell_init::print_init(shell)?;
-            Ok(0)
-        }
         Some(Command::External(ref args)) if !args.is_empty() => {
             let task_name = &args[0];
             let task_args = &args[1..];

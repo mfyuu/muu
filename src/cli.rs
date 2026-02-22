@@ -25,11 +25,6 @@ pub enum Command {
     List,
     /// Initialize a new runz.toml
     Init,
-    /// Output shell integration script
-    ShellInit {
-        /// Shell name (e.g. zsh)
-        shell: String,
-    },
     /// Run a task (catch-all for dynamic task names)
     #[command(external_subcommand)]
     External(Vec<String>),
