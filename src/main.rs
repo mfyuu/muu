@@ -17,7 +17,7 @@ fn main() {
     let code = match run(cli) {
         Ok(code) => code,
         Err(e) => {
-            eprintln!("{e}");
+            eprintln!("\x1b[31mError: {e}\x1b[0m");
             1
         }
     };

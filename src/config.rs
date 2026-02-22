@@ -50,10 +50,27 @@ pub struct ResolvedTask {
 
 pub fn parse_config(path: &Path) -> Result<ConfigFile, RunzError> {
     let content = std::fs::read_to_string(path).map_err(RunzError::Io)?;
-    toml::from_str::<ConfigFile>(&content).map_err(|e| RunzError::ConfigParse {
-        path: path.to_path_buf(),
-        reason: e.to_string(),
+    toml::from_str::<ConfigFile>(&content).map_err(|e| {
+        let msg = e.to_string();
+        if let Some(name) = extract_duplicate_key(&msg) {
+            RunzError::DuplicateTask {
+                name,
+                path: path.to_path_buf(),
+            }
+        } else {
+            RunzError::ConfigParse {
+                path: path.to_path_buf(),
+                reason: msg,
+            }
+        }
     })
+}
+
+fn extract_duplicate_key(msg: &str) -> Option<String> {
+    let marker = "duplicate key `";
+    let start = msg.find(marker)? + marker.len();
+    let end = msg[start..].find('`')? + start;
+    Some(msg[start..end].to_string())
 }
 
 // ---------- File discovery ----------

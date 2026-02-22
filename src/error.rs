@@ -4,31 +4,31 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum RunzError {
-    #[error("error: missing required argument '{name}'")]
+    #[error("missing required argument '{name}'")]
     MissingRequiredArg { name: String },
 
-    #[error("error: task '{name}' not found")]
+    #[error("task '{name}' not found")]
     TaskNotFound { name: String },
 
-    #[error("error: no runz.toml or global config found")]
+    #[error("no runz.toml or global config found")]
     NoConfigFound,
 
-    #[error("error: duplicate task '{name}' in {path}")]
+    #[error("duplicate task '{name}' in {path}")]
     DuplicateTask { name: String, path: PathBuf },
 
-    #[error("error: runz.toml already exists")]
+    #[error("runz.toml already exists")]
     AlreadyExists,
 
-    #[error("error: unknown argument '{name}'")]
+    #[error("unknown argument '{name}'")]
     UnknownArg { name: String },
 
-    #[error("error: cannot mix positional and named arguments")]
+    #[error("cannot mix positional and named arguments")]
     MixedArgStyles,
 
-    #[error("error: failed to parse {path}: {reason}")]
+    #[error("failed to parse {path}: {reason}")]
     ConfigParse { path: PathBuf, reason: String },
 
-    #[error("error: no tasks defined")]
+    #[error("no tasks defined")]
     NoTasksDefined,
 
     #[error("{0}")]
