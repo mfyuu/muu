@@ -43,7 +43,9 @@ pub fn select(tasks: &[ResolvedTask]) -> Result<i32, RunzError> {
         .map(|task| TaskOption { task, max_name })
         .collect();
 
-    let result = Select::new("Select a task:", options).prompt();
+    let result = Select::new("Select a task:", options)
+        .with_page_size(10)
+        .prompt();
 
     match result {
         Ok(selected) => execute_selected(selected.task),
