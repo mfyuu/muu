@@ -14,18 +14,20 @@ struct TaskOption<'a> {
     max_name: usize,
 }
 
+const DIM: &str = "\x1b[2m";
+const RESET_DIM: &str = "\x1b[22m";
+
 impl fmt::Display for TaskOption<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let desc = self.task.def.description.as_deref().unwrap_or("");
-        let source_label = format!("[{}]", self.task.source);
         if desc.is_empty() {
-            write!(f, "{:<w$}   {source_label}", self.task.name, w = self.max_name)
+            write!(f, "{}", self.task.name)
         } else {
             write!(
                 f,
-                "{:<w$} - {desc} {source_label}",
+                "{:<name_w$}  {DIM}{desc}{RESET_DIM}",
                 self.task.name,
-                w = self.max_name,
+                name_w = self.max_name,
             )
         }
     }

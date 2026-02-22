@@ -18,7 +18,7 @@ pub fn list(tasks: &[ResolvedTask]) {
         let source_label = format!("[{}]", task.source);
         if desc.is_empty() {
             println!(
-                "{:<name_w$}   {:<desc_w$} {source_label}",
+                "{:<name_w$}  {:<desc_w$} \x1b[2m{source_label}\x1b[22m",
                 task.name,
                 "",
                 name_w = max_name,
@@ -26,7 +26,7 @@ pub fn list(tasks: &[ResolvedTask]) {
             );
         } else {
             println!(
-                "{:<name_w$} - {desc:<desc_w$} {source_label}",
+                "{:<name_w$}  \x1b[2m{desc:<desc_w$} {source_label}\x1b[22m",
                 task.name,
                 name_w = max_name,
                 desc_w = max_desc,
