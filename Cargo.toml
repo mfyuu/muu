@@ -9,6 +9,7 @@ toml = { version = "0.8", features = ["preserve_order"] }
 serde = { version = "1", features = ["derive"] }
 indexmap = { version = "2", features = ["serde"] }
 dirs = "6"
+inquire = "0.7"
 thiserror = "2"
 
 [dev-dependencies]

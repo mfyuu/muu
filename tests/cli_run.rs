@@ -161,18 +161,6 @@ fn run_multiline_stops_on_error() {
 }
 
 #[test]
-fn run_no_args_shows_phase2_message() {
-    let dir = TempDir::new().unwrap();
-    std::fs::write(dir.path().join("runz.toml"), "[tasks]\n").unwrap();
-
-    runz()
-        .current_dir(dir.path())
-        .assert()
-        .failure()
-        .stderr(predicate::str::contains("not yet implemented"));
-}
-
-#[test]
 fn version_flag() {
     runz()
         .arg("--version")

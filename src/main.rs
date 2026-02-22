@@ -37,18 +37,19 @@ fn run(cli: Cli) -> Result<i32, RunzError> {
             commands::list::list(&tasks);
             Ok(0)
         }
-        Some(Command::External(args)) if !args.is_empty() => {
+        Some(Command::ShellInit { ref shell }) => {
+            commands::shell_init::print_init(shell)?;
+            Ok(0)
+        }
+        Some(Command::External(ref args)) if !args.is_empty() => {
             let task_name = &args[0];
             let task_args = &args[1..];
             let tasks = config::load_tasks(&cwd, cli.local_only, cli.global_only)?;
             commands::run::run(task_name, task_args, &tasks)
         }
         _ => {
-            // Phase 2: interactive selector
-            eprintln!("interactive selector is not yet implemented. Please specify a task name.");
-            eprintln!("usage: runz <task> [args...]");
-            eprintln!("list tasks: runz list");
-            Ok(1)
+            let tasks = config::load_tasks(&cwd, cli.local_only, cli.global_only)?;
+            commands::select::select(&tasks)
         }
     }
 }

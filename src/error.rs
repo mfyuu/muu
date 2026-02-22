@@ -28,6 +28,12 @@ pub enum RunzError {
     #[error("error: failed to parse {path}: {reason}")]
     ConfigParse { path: PathBuf, reason: String },
 
+    #[error("error: no tasks defined")]
+    NoTasksDefined,
+
+    #[error("error: unsupported shell '{name}'")]
+    UnsupportedShell { name: String },
+
     #[error("{0}")]
     Io(#[from] std::io::Error),
 }
