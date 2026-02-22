@@ -7,22 +7,29 @@ pub fn list(tasks: &[ResolvedTask]) {
     }
 
     let max_name = tasks.iter().map(|t| t.name.len()).max().unwrap_or(0);
+    let max_desc = tasks
+        .iter()
+        .map(|t| t.def.description.as_deref().unwrap_or("").len())
+        .max()
+        .unwrap_or(0);
 
     for task in tasks {
-        let desc = task
-            .def
-            .description
-            .as_deref()
-            .unwrap_or("");
+        let desc = task.def.description.as_deref().unwrap_or("");
         let source_label = format!("[{}]", task.source);
         if desc.is_empty() {
-            println!("{:<width$}   {source_label}", task.name, width = max_name);
+            println!(
+                "{:<name_w$}   {:<desc_w$} {source_label}",
+                task.name,
+                "",
+                name_w = max_name,
+                desc_w = max_desc,
+            );
         } else {
             println!(
-                "{:<width$} - {desc:<desc_width$} {source_label}",
+                "{:<name_w$} - {desc:<desc_w$} {source_label}",
                 task.name,
-                width = max_name,
-                desc_width = 0,
+                name_w = max_name,
+                desc_w = max_desc,
             );
         }
     }
