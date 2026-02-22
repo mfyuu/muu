@@ -58,6 +58,7 @@
               openssl
               pkg-config
               cargo-deny
+              cargo-dist
               cargo-edit
               cargo-watch
               rust-analyzer
