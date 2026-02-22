@@ -91,6 +91,27 @@ args = { name = "" }
 }
 
 #[test]
+fn run_unknown_named_arg() {
+    let dir = TempDir::new().unwrap();
+    std::fs::write(
+        dir.path().join("runz.toml"),
+        r#"
+[tasks.greet]
+cmd = "echo $name"
+args = { name = "" }
+"#,
+    )
+    .unwrap();
+
+    runz()
+        .args(["greet", "--typo=value"])
+        .current_dir(dir.path())
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("unknown argument 'typo'"));
+}
+
+#[test]
 fn run_task_not_found() {
     let dir = TempDir::new().unwrap();
     std::fs::write(dir.path().join("runz.toml"), "[tasks]\n").unwrap();

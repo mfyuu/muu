@@ -19,6 +19,9 @@ pub enum RunzError {
     #[error("error: runz.toml already exists")]
     AlreadyExists,
 
+    #[error("error: unknown argument '{name}'")]
+    UnknownArg { name: String },
+
     #[error("error: cannot mix positional and named arguments")]
     MixedArgStyles,
 

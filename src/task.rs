@@ -79,8 +79,9 @@ pub fn resolve_args(
             for (key, value) in &pairs {
                 if resolved.contains_key(key) {
                     resolved.insert(key.clone(), value.clone());
+                } else {
+                    return Err(RunzError::UnknownArg { name: key.clone() });
                 }
-                // Unknown named args are silently ignored
             }
             // Check required args
             for (name, value) in &resolved {
@@ -165,6 +166,13 @@ mod tests {
         let defined = idx(&[("dir", "."), ("bucket", "")]);
         let err = resolve_args(&defined, &strs(&["--dir=./dist"])).unwrap_err();
         assert!(matches!(err, RunzError::MissingRequiredArg { name } if name == "bucket"));
+    }
+
+    #[test]
+    fn named_unknown_arg_error() {
+        let defined = idx(&[("dir", "."), ("bucket", "")]);
+        let err = resolve_args(&defined, &strs(&["--typo=value"])).unwrap_err();
+        assert!(matches!(err, RunzError::UnknownArg { name } if name == "typo"));
     }
 
     #[test]
