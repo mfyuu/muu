@@ -23,7 +23,10 @@ fn select_no_tasks_defined() {
     let dir = TempDir::new().unwrap();
     std::fs::write(dir.path().join("runz.toml"), "[tasks]\n").unwrap();
 
+    // Override HOME so the global config is not picked up
+    let fake_home = TempDir::new().unwrap();
     runz()
+        .env("HOME", fake_home.path())
         .current_dir(dir.path())
         .assert()
         .failure()
