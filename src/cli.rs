@@ -34,5 +34,11 @@ pub enum Command {
 }
 
 pub fn build_cli() -> clap::Command {
-    Cli::command().add(SubcommandCandidates::new(TaskCandidates))
+    Cli::command()
+        .add(SubcommandCandidates::new(TaskCandidates))
+        .mut_arg("global_only", |a| a.hide(true))
+        .mut_arg("local_only", |a| a.hide(true))
+        .disable_help_flag(true)
+        .disable_version_flag(true)
+        .disable_help_subcommand(true)
 }
