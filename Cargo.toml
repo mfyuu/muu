@@ -11,6 +11,7 @@ authors = ["mfyuu"]
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
+clap_complete = { version = "4", features = ["unstable-dynamic"] }
 toml = { version = "0.8", features = ["preserve_order"] }
 serde = { version = "1", features = ["derive"] }
 indexmap = { version = "2", features = ["serde"] }

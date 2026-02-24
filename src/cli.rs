@@ -1,4 +1,7 @@
-use clap::{Parser, Subcommand};
+use clap::{CommandFactory, Parser, Subcommand};
+use clap_complete::engine::SubcommandCandidates;
+
+use crate::completions::TaskCandidates;
 
 #[derive(Parser, Debug)]
 #[command(
@@ -28,4 +31,8 @@ pub enum Command {
     /// Run a task (catch-all for dynamic task names)
     #[command(external_subcommand)]
     External(Vec<String>),
+}
+
+pub fn build_cli() -> clap::Command {
+    Cli::command().add(SubcommandCandidates::new(TaskCandidates))
 }

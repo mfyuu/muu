@@ -13,12 +13,6 @@ A minimal, fast task runner written in Rust.
 
 ## Install
 
-### Homebrew (macOS)
-
-```sh
-brew install mfyuu/tap/muu
-```
-
 ### Shell (macOS / Linux)
 
 ```sh
@@ -29,6 +23,12 @@ curl --proto '=https' --tlsv1.2 -LsSf https://github.com/mfyuu/muu/releases/late
 
 ```sh
 powershell -ExecutionPolicy Bypass -c "irm https://github.com/mfyuu/muu/releases/latest/download/muu-installer.ps1 | iex"
+```
+
+### Homebrew (macOS)
+
+```sh
+brew install mfyuu/tap/muu
 ```
 
 ## Quick Start
@@ -112,6 +112,25 @@ args = { dir = ".", bucket = "" }
 - Non-empty value = optional (used as default)
 - Empty string `""` = required (error if not provided)
 - Key order determines positional argument order
+
+## Shell Completions
+
+Tab completion for task names, subcommands, and flags.
+
+**Zsh** (add to `~/.zshrc`):
+```sh
+source <(COMPLETE=zsh muu)
+```
+
+**Bash** (add to `~/.bashrc`):
+```sh
+source <(COMPLETE=bash muu)
+```
+
+**Fish** (add to `~/.config/fish/config.fish`):
+```fish
+COMPLETE=fish muu | source
+```
 
 ## Configuration
 
