@@ -97,11 +97,11 @@ muu list -l    # works with list too
 
 ## Task Definition
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `cmd` | string | yes | Command to run. Use `"""` for multi-line. |
-| `description` | string | no | Shown in `muu list` and the selector. |
-| `args` | inline table | no | Argument definitions. Key order = positional order. |
+| Field         | Type         | Required | Description                                         |
+| ------------- | ------------ | -------- | --------------------------------------------------- |
+| `cmd`         | string       | yes      | Command to run. Use `"""` for multi-line.           |
+| `description` | string       | no       | Shown in `muu list` and the selector.               |
+| `args`        | inline table | no       | Argument definitions. Key order = positional order. |
 
 ### Arguments
 
@@ -118,16 +118,19 @@ args = { dir = ".", bucket = "" }
 Tab completion for task names, subcommands, and flags.
 
 **Zsh** (add to `~/.zshrc`):
+
 ```sh
 source <(COMPLETE=zsh muu)
 ```
 
 **Bash** (add to `~/.bashrc`):
+
 ```sh
 source <(COMPLETE=bash muu)
 ```
 
 **Fish** (add to `~/.config/fish/config.fish`):
+
 ```fish
 COMPLETE=fish muu | source
 ```
