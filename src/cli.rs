@@ -38,6 +38,8 @@ pub fn build_cli() -> clap::Command {
         .add(SubcommandCandidates::new(TaskCandidates))
         .mut_arg("global_only", |a| a.hide(true))
         .mut_arg("local_only", |a| a.hide(true))
+        .mut_subcommand("init", |cmd| cmd.hide(true))
+        .mut_subcommand("list", |cmd| cmd.hide(true))
         .disable_help_flag(true)
         .disable_version_flag(true)
         .disable_help_subcommand(true)
