@@ -1,9 +1,35 @@
 use std::path::{Path, PathBuf};
 
 use indexmap::IndexMap;
+use serde::de::Deserializer;
 use serde::Deserialize;
 
 use crate::error::MuuError;
+
+// ---------- Arg definition ----------
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArgDef {
+    pub default: String,
+    pub optional: bool,
+}
+
+fn deserialize_args<'de, D>(deserializer: D) -> Result<IndexMap<String, ArgDef>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let raw: IndexMap<String, String> = IndexMap::deserialize(deserializer)?;
+    let mut args = IndexMap::new();
+    for (key, default) in raw {
+        let (default, optional) = if default == "?" {
+            (String::new(), true)
+        } else {
+            (default, false)
+        };
+        args.insert(key, ArgDef { default, optional });
+    }
+    Ok(args)
+}
 
 // ---------- TOML deserialization types ----------
 
@@ -18,8 +44,8 @@ pub struct TaskDef {
     pub cmd: String,
     #[serde(default)]
     pub description: Option<String>,
-    #[serde(default)]
-    pub args: IndexMap<String, String>,
+    #[serde(default, deserialize_with = "deserialize_args")]
+    pub args: IndexMap<String, ArgDef>,
 }
 
 // ---------- Resolved types ----------
@@ -206,8 +232,10 @@ args = { dir = ".", bucket = "" }
         // Verify key order is preserved
         let keys: Vec<&String> = deploy.args.keys().collect();
         assert_eq!(keys, vec!["dir", "bucket"]);
-        assert_eq!(deploy.args["dir"], ".");
-        assert_eq!(deploy.args["bucket"], "");
+        assert_eq!(deploy.args["dir"].default, ".");
+        assert_eq!(deploy.args["bucket"].default, "");
+        assert!(!deploy.args["dir"].optional);
+        assert!(!deploy.args["bucket"].optional);
     }
 
     #[test]
@@ -301,6 +329,25 @@ cmd = "echo g"
         let dir = TempDir::new().unwrap();
         let err = load_tasks(dir.path(), true, false).unwrap_err();
         assert!(matches!(err, MuuError::NoConfigFound));
+    }
+
+    #[test]
+    fn parse_optional_args() {
+        let dir = TempDir::new().unwrap();
+        let path = write_file(
+            dir.path(),
+            "muu.toml",
+            r#"
+[tasks.greet]
+cmd = "echo hello $name"
+args = { name = "?" }
+"#,
+        );
+        let cfg = parse_config(&path).unwrap();
+        let greet = &cfg.tasks["greet"];
+        assert_eq!(greet.args.len(), 1);
+        assert_eq!(greet.args["name"].default, "");
+        assert!(greet.args["name"].optional);
     }
 
     #[test]

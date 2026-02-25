@@ -1,5 +1,6 @@
 use indexmap::IndexMap;
 
+use crate::config::ArgDef;
 use crate::error::MuuError;
 
 /// Classify raw CLI args as positional or named.
@@ -40,7 +41,7 @@ fn classify_args(raw: &[String]) -> Result<ArgStyle, MuuError> {
 /// Resolve raw args against the defined args for a task.
 /// Returns a map of arg name → resolved value.
 pub fn resolve_args(
-    defined: &IndexMap<String, String>,
+    defined: &IndexMap<String, ArgDef>,
     raw: &[String],
 ) -> Result<IndexMap<String, String>, MuuError> {
     let style = classify_args(raw)?;
@@ -48,32 +49,32 @@ pub fn resolve_args(
 
     match style {
         ArgStyle::None => {
-            for (name, default) in defined {
-                if default.is_empty() {
+            for (name, arg) in defined {
+                if arg.default.is_empty() && !arg.optional {
                     return Err(MuuError::MissingRequiredArg {
                         name: name.clone(),
                     });
                 }
-                resolved.insert(name.clone(), default.clone());
+                resolved.insert(name.clone(), arg.default.clone());
             }
         }
         ArgStyle::Positional(values) => {
-            for (i, (name, default)) in defined.iter().enumerate() {
+            for (i, (name, arg)) in defined.iter().enumerate() {
                 if let Some(val) = values.get(i) {
                     resolved.insert(name.clone(), val.clone());
-                } else if default.is_empty() {
+                } else if arg.default.is_empty() && !arg.optional {
                     return Err(MuuError::MissingRequiredArg {
                         name: name.clone(),
                     });
                 } else {
-                    resolved.insert(name.clone(), default.clone());
+                    resolved.insert(name.clone(), arg.default.clone());
                 }
             }
         }
         ArgStyle::Named(pairs) => {
             // Start with defaults
-            for (name, default) in defined {
-                resolved.insert(name.clone(), default.clone());
+            for (name, arg) in defined {
+                resolved.insert(name.clone(), arg.default.clone());
             }
             // Override with provided values
             for (key, value) in &pairs {
@@ -85,7 +86,8 @@ pub fn resolve_args(
             }
             // Check required args
             for (name, value) in &resolved {
-                if value.is_empty() {
+                let arg = &defined[name];
+                if value.is_empty() && !arg.optional {
                     return Err(MuuError::MissingRequiredArg {
                         name: name.clone(),
                     });
@@ -118,10 +120,33 @@ mod tests {
 
     use super::*;
 
-    fn idx(pairs: &[(&str, &str)]) -> IndexMap<String, String> {
+    fn idx(pairs: &[(&str, &str)]) -> IndexMap<String, ArgDef> {
         pairs
             .iter()
-            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .map(|(k, v)| {
+                (
+                    k.to_string(),
+                    ArgDef {
+                        default: v.to_string(),
+                        optional: false,
+                    },
+                )
+            })
+            .collect()
+    }
+
+    fn idx_opt(pairs: &[(&str, &str, bool)]) -> IndexMap<String, ArgDef> {
+        pairs
+            .iter()
+            .map(|(k, v, opt)| {
+                (
+                    k.to_string(),
+                    ArgDef {
+                        default: v.to_string(),
+                        optional: *opt,
+                    },
+                )
+            })
             .collect()
     }
 
@@ -199,8 +224,45 @@ mod tests {
     }
 
     #[test]
+    fn optional_arg_no_input() {
+        let defined = idx_opt(&[("name", "", true)]);
+        let resolved = resolve_args(&defined, &[]).unwrap();
+        assert_eq!(resolved["name"], "");
+    }
+
+    #[test]
+    fn optional_arg_with_input() {
+        let defined = idx_opt(&[("name", "", true)]);
+        let resolved = resolve_args(&defined, &strs(&["World"])).unwrap();
+        assert_eq!(resolved["name"], "World");
+    }
+
+    #[test]
+    fn optional_arg_positional_skipped() {
+        let defined = idx_opt(&[("target", ".", false), ("name", "", true)]);
+        let resolved = resolve_args(&defined, &strs(&["./dist"])).unwrap();
+        assert_eq!(resolved["target"], "./dist");
+        assert_eq!(resolved["name"], "");
+    }
+
+    #[test]
+    fn optional_arg_named_skipped() {
+        let defined = idx_opt(&[("dir", ".", false), ("name", "", true)]);
+        let resolved = resolve_args(&defined, &strs(&["--dir=./dist"])).unwrap();
+        assert_eq!(resolved["dir"], "./dist");
+        assert_eq!(resolved["name"], "");
+    }
+
+    fn str_map(pairs: &[(&str, &str)]) -> IndexMap<String, String> {
+        pairs
+            .iter()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect()
+    }
+
+    #[test]
     fn expand_simple() {
-        let resolved = idx(&[("dir", "./dist"), ("bucket", "my-bucket")]);
+        let resolved = str_map(&[("dir", "./dist"), ("bucket", "my-bucket")]);
         let cmd = "aws s3 sync $dir s3://$bucket";
         assert_eq!(
             expand_command(cmd, &resolved),
@@ -210,14 +272,14 @@ mod tests {
 
     #[test]
     fn expand_longest_match_first() {
-        let resolved = idx(&[("a", "short"), ("ab", "long")]);
+        let resolved = str_map(&[("a", "short"), ("ab", "long")]);
         let cmd = "$ab $a";
         assert_eq!(expand_command(cmd, &resolved), "long short");
     }
 
     #[test]
     fn no_defined_args_no_raw() {
-        let defined: IndexMap<String, String> = IndexMap::new();
+        let defined: IndexMap<String, ArgDef> = IndexMap::new();
         let resolved = resolve_args(&defined, &[]).unwrap();
         assert!(resolved.is_empty());
     }

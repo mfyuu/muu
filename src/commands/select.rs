@@ -4,7 +4,7 @@ use indexmap::IndexMap;
 use inquire::validator::Validation;
 use inquire::{InquireError, Select, Text};
 
-use crate::config::ResolvedTask;
+use crate::config::{ArgDef, ResolvedTask};
 use crate::error::MuuError;
 use crate::runner;
 use crate::task::expand_command;
@@ -81,15 +81,15 @@ fn execute_selected(task: &ResolvedTask) -> Result<i32, MuuError> {
     }
 }
 
-fn prompt_args(defined: &IndexMap<String, String>) -> Result<PromptResult, MuuError> {
+fn prompt_args(defined: &IndexMap<String, ArgDef>) -> Result<PromptResult, MuuError> {
     let mut resolved: IndexMap<String, String> = IndexMap::new();
 
-    for (name, default) in defined {
-        let is_required = default.is_empty();
-        let prompt_message = if is_required {
+    for (name, arg) in defined {
+        let is_required = arg.default.is_empty() && !arg.optional;
+        let prompt_message = if arg.default.is_empty() {
             format!("{name}:")
         } else {
-            format!("{name}[{default}]:")
+            format!("{name}[{}]:", arg.default)
         };
 
         let mut text_prompt = Text::new(&prompt_message);
@@ -105,8 +105,8 @@ fn prompt_args(defined: &IndexMap<String, String>) -> Result<PromptResult, MuuEr
 
         match text_prompt.prompt() {
             Ok(value) => {
-                let value = if value.is_empty() && !is_required {
-                    default.clone()
+                let value = if value.is_empty() && !arg.default.is_empty() {
+                    arg.default.clone()
                 } else {
                     value
                 };
