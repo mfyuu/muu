@@ -70,11 +70,12 @@ fn execute_selected(task: &ResolvedTask) -> Result<i32, MuuError> {
         return Ok(runner::execute(&task.def.cmd));
     }
 
-    eprintln!("\x1b[35m$\x1b[0m {}", task.def.cmd);
+    eprintln!("{DIM}# {}{RESET_DIM}", task.def.cmd);
 
     match prompt_args(&task.def.args)? {
         PromptResult::Resolved(resolved) => {
             let cmd = expand_command(&task.def.cmd, &resolved);
+            eprintln!("\x1b[35m$\x1b[0m {cmd}");
             Ok(runner::execute(&cmd))
         }
         PromptResult::Cancelled => Ok(1),
