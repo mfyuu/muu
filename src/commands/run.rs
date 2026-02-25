@@ -13,5 +13,6 @@ pub fn run(name: &str, raw_args: &[String], tasks: &[ResolvedTask]) -> Result<i3
 
     let resolved = resolve_args(&task.def.args, raw_args)?;
     let cmd = expand_command(&task.def.cmd, &resolved);
+    eprintln!("\x1b[35m$\x1b[0m {cmd}");
     Ok(runner::execute(&cmd))
 }

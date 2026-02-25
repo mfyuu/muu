@@ -66,11 +66,11 @@ enum PromptResult {
 
 fn execute_selected(task: &ResolvedTask) -> Result<i32, MuuError> {
     if task.def.args.is_empty() {
-        eprintln!("\x1b[36m$ {}\x1b[0m", task.def.cmd);
+        eprintln!("\x1b[35m$\x1b[0m {}", task.def.cmd);
         return Ok(runner::execute(&task.def.cmd));
     }
 
-    eprintln!("\x1b[36m$ {}\x1b[0m", task.def.cmd);
+    eprintln!("\x1b[35m$\x1b[0m {}", task.def.cmd);
 
     match prompt_args(&task.def.args)? {
         PromptResult::Resolved(resolved) => {
