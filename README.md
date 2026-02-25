@@ -2,6 +2,8 @@
 
 A minimal, fast task runner written in Rust.
 
+<img alt="muu interactive selector" src="docs/tapes/hero.gif" />
+
 ## Features
 
 - TOML-based task definitions
@@ -111,7 +113,22 @@ args = { dir = ".", bucket = "" }
 
 - Non-empty value = optional (used as default)
 - Empty string `""` = required (error if not provided)
+- `"?"` = optional with no default (empty string if omitted)
 - Key order determines positional argument order
+
+```toml
+# Optional argument example
+[tasks.greet]
+cmd = """
+if [ -n "$name" ]; then echo "Hello, $name!"; else echo "Hello!"; fi
+"""
+args = { name = "?" }
+```
+
+```sh
+muu greet          # Hello!
+muu greet Alice    # Hello, Alice!
+```
 
 ## Shell Completions
 

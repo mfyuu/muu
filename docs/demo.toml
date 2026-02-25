@@ -1,0 +1,55 @@
+[tasks.dev]
+description = "Start development server"
+cmd = "echo 'Starting dev server on http://localhost:3000...'"
+
+[tasks.build]
+description = "Build for production"
+cmd = "echo 'Building for production...'"
+
+[tasks.test]
+description = "Run test suite"
+cmd = "echo 'Running tests...'"
+
+[tasks.lint]
+description = "Run linter"
+cmd = "echo 'Linting... No issues found'"
+
+[tasks.fmt]
+description = "Format code"
+cmd = "echo 'Formatting... All files formatted'"
+
+[tasks.deploy]
+description = "Deploy to environment"
+cmd = "echo 'Deploying $target to $env...'"
+args = { target = "./dist", env = "" }
+
+[tasks.greet]
+description = "Say hello"
+cmd = "echo 'Hello, $name!'"
+args = { name = "world" }
+
+[tasks.db-migrate]
+description = "Run database migrations"
+cmd = "echo 'Running migrations on $database...'"
+args = { database = "dev" }
+
+[tasks.docker-up]
+description = "Start Docker containers"
+cmd = "echo 'Starting containers...'"
+
+[tasks.clean]
+description = "Clean build artifacts"
+cmd = "echo 'Cleaning build artifacts...'"
+
+[tasks.release]
+description = "Create a new release"
+cmd = "echo 'Creating release $version...'"
+args = { version = "" }
+
+[tasks.reset]
+description = "Reset local state"
+cmd = "echo 'Resetting local state...'"
+
+[tasks.recent]
+description = "Show recent commits"
+cmd = "git log --oneline -5"
