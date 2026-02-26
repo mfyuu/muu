@@ -10,14 +10,14 @@ Enter
 Sleep 1s
 Show
 
-# 1. Direct execution (positional args)
-Type "muu greet World"
+# 1. Direct execution (no args)
+Type "muu hello"
 Sleep 500ms
 Enter
 Sleep 1.5s
 
-# 2. Direct execution (named args)
-Type "muu greet --name=Alice"
+# 2. Direct execution (with arg)
+Type "muu greet world"
 Sleep 500ms
 Enter
 Sleep 1.5s

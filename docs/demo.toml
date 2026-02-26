@@ -23,8 +23,12 @@ description = "Deploy to environment"
 cmd = "echo 'Deploying $target to $env...'"
 args = { target = "./dist", env = "" }
 
-[tasks.greet]
+[tasks.hello]
 description = "Say hello"
+cmd = "echo 'Hello!'"
+
+[tasks.greet]
+description = "Greet someone"
 cmd = "echo 'Hello, $name!'"
 args = { name = "world" }
 
