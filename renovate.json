@@ -1,6 +1,25 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ]
+  "extends": ["config:recommended"],
+  "timezone": "Asia/Tokyo",
+  "description": "Schedule weekly on Monday nights",
+  "schedule": ["* 0-5 * * 1"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "platformAutomerge": true
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "groupName": "major updates (manual review)"
+    },
+    {
+      "matchDatasources": ["npm"],
+      "minimumReleaseAge": "7 days"
+    }
+  ],
+  "reviewers": ["mfyuu"],
+  "labels": ["dependencies", "renovate"],
+  "dependencyDashboard": false
 }
